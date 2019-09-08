@@ -13,6 +13,6 @@ Add domains handling
 Set passwordless access
 
     ssh-keygen -t rsa
-    cat .ssh/id_rsa.pub | ssh user@remote 'cat >> .ssh/authorized_keys'
+    cat ~/.ssh/id_rsa.pub | ssh user@remote 'cat >> .ssh/authorized_keys'
 
 
