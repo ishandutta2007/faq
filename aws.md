@@ -9,23 +9,25 @@ login page for okta authentication: okta.domain.com then it redirects to aws wit
 install okta client
 
     python3 -m pip install --upgrade awscli okta-awscli
+    #pip3 install awscli okta-awscli --proxy="https://user:pass@proxy.com:80"
 
 create config file: ~/.okta-aws
 
+    echo '
     [default]
     base-url = company.okta.com
-
-setup client for windows (python) for known API token
-
-    pip install awscli --proxy="https://user:pass@proxy.com:80"
+    ' > ~/.okta-aws
 
 configure AWS client ~/.aws/config
 
+    mkdir -p ~/.aws
+    echo '
     [default]
     # Ireland
     #region = eu-west-1
     # Oregon
     region = us-west-2
+    ' > ~/.aws/config
 
 update env if proxy needed or multiple python env exists
 
@@ -39,8 +41,8 @@ update env if proxy needed or multiple python env exists
 login with okta, your user and password and code from Google Authenticator
 
     okta-awscli
-     Enter username: sg0210948
-     Enter password:
+     Enter username: ...
+     Enter password: ...
      Registered MFA factors:
      1: Google Authenticator
      2: Okta Verify - Push

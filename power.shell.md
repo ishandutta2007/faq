@@ -134,7 +134,7 @@ run script
 get info about domains and users
 
     Get-ADDomain
-    Get-ADUser sg0123456
+    Get-ADUser userX
 
 
 ##### links

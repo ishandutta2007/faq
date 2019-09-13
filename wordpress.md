@@ -1,6 +1,6 @@
 #### WORDPRESS
 
-Installing
+##### Installing
 
     mkdir /apps/wordpress/gui
     mkdir /apps/wordpress/db
@@ -33,17 +33,21 @@ Installing
     sed -i '/put your unique phrase here/, 1d' /apps/wordpress/gui/wordpress/wp-config.php
     rm /tmp/patch
 
-Plugins: 
+##### Plugins 
 
- * set up header-based authentication: https://wordpress.org/plugins/header-login/
- * shiboleth authentication via REMOTE_USER server parameter: https://wordpress.org/plugins/http-authentication/
- * serach engine: https://wordpress.org/plugins/search-in-place/
- * roles management: https://wordpress.org/plugins/multiple-roles/
- * stats: https://wordpress.org/plugins/wp-slimstat/
- * external docs: https://wordpress.org/plugins/tgn-embed-everything/
+Useful plugins used befire:
+
+ * [set up header-based authentication](https://wordpress.org/plugins/header-login/)
+ * [shiboleth authentication via REMOTE_USER server parameter](https://wordpress.org/plugins/http-authentication/)
+ * [search engine](https://wordpress.org/plugins/search-in-place/)
+ * [roles management](https://wordpress.org/plugins/multiple-roles/)
+ * [stats](https://wordpress.org/plugins/wp-slimstat/)
+ * [external docs](https://wordpress.org/plugins/tgn-embed-everything/)
 	
 
-Debugging
+##### Debugging
+
+Issues logging
 
     # add in /wp-config.php followig
     define('WP_DEBUG', true);
@@ -52,8 +56,12 @@ Debugging
     # add in the code:
     error_log("your message");
 	
-Maintenance
+##### Maintenance
+
+Can't connect to DB
 
  # fix for Host 'host-xyz' is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'
 mysqladmin -u root -pwp_admin flush-hosts
+
+Command line management with [wp-cli](https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar)
 
