@@ -152,6 +152,17 @@ run command on instance
      --details \
      --query "CommandInvocations[].CommandPlugins[].{Output:Output}" 
 
+list instance IP and tag value for defined filters and query
+
+    aws ec2 describe-instances \
+     --filter Name=tag-value,Values=userName \
+     --query 'Reservations[].Instances[].[Tags[?starts_with(Key,`aws:cloudformation:stack-name`) == `true`].Value,InstanceId,InstanceType,PrivateIpAddress,State.Name,Monitoring.State,LaunchTime]' 
+
+get names of all images of form specyfic user
+
+    aws ec2 describe-images --owners "847074401234" \
+     | jq -r '.Images[] | "\(.OwnerId)\t\(.Name)"'
+
 ##### working with cloud formation
 
 validate script
@@ -167,6 +178,21 @@ advanced searching
 check stacks with issues
 
     aws cloudformation list-stacks --stack-status-filter CREATE_FAILED DELETE_FAILED UPDATE_ROLLBACK_FAILED ROLLBACK_COMPLETE  | egrep '"StackName"|"StackStatus"'
+
+##### working with roles and policies
+
+lists all the managed policies that are available in your AWS account, including your own customer-defined managed policies and all AWS managed policies
+
+    aws iam list-policies | jq '.Policies[].PolicyName' | sort
+
+lists the IAM roles that have the specified path prefix. If there are none, the operation returns an empty list. 
+
+    aws iam list-roles | jq -r '.Roles[] | "\(.RoleName)\t\(.Description)"'
+
+lists the IAM users that have the specified path prefixi, if no path prefix is specified, the operation returns all users in the AWS account
+
+    aws iam list-users | jq '.Users[].UserName'
+
 
 ##### working with costs
 

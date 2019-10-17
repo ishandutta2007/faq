@@ -1,11 +1,13 @@
-#### Web
+#### AZURE
+
+##### Web
 
 login page: https://portal.azure.com , web access may be usefull for using shell from Azure [referece](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) Also using PowerShell is a possible that way.
 
 
-#### Linux
+##### Linux
 
-##### instal az client for python3
+###### instal az client for python3
 
 download and run script from ms [source](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?view=azure-cli-latest)
 
@@ -19,7 +21,7 @@ other commands to run in case of troubles and multiple python environments
     export http_proxy="http://user:pass@host.domain.com:80"
     export https_proxy="$http_proxy" ftp_proxy="$http_proxy"
 
-##### login & looking around
+###### login & looking around
 
 login with browser
 
@@ -34,7 +36,7 @@ account information
     az account show
     az account list-locations | grep name
 
-##### create and manage VM
+###### create and manage VM
 
 create/remove resource group
 
@@ -83,7 +85,7 @@ set up user for ssh connectivity
     az vm user update --resource-group myResourceGroup --name myvm01 --username azure --password azureX
     az vm user reset-ssh --resource-group myResourceGroup --name myvm01
 
-##### set up app on VM
+###### set up app on VM
 
 install web server on VM
 
@@ -100,16 +102,16 @@ open/close port for http access
     az network nsg rule delete --resource-group myResourceGroup --nsg-name myvm01NSG --name open-port-80
 
 
-##### links
+###### links
 
  * https://docs.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-cli
  * https://docs.microsoft.com/en-us/azure/virtual-machines/linux/tutorial-manage-vm
  * https://docs.microsoft.com/en-us/azure/virtual-machines/troubleshooting/
 
-#### Windows
+##### Windows
 
 
-##### install AZ PowerShell module
+###### install AZ PowerShell module
 
 install related module with power shell (as administrator)
 
@@ -117,7 +119,7 @@ install related module with power shell (as administrator)
     PS > Connect-AzAccount
     PS > ls ~/.azure
 
-##### links
+###### links
 
  * https://azure.microsoft.com/en-us/downloads/
  * https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-2.4.0&viewFallbackFrom=azps-1.2.0
