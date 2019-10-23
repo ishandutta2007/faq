@@ -48,7 +48,7 @@ DB level (when logged into DB)
      FLASH                          CONNECTED      3481464    3285080          0     196384          0    3285080
      DATA                           CONNECTED      8191864       9732          0    8182132          0       9732
 
-This may not be seen with common disk usasge utilities e.g.
+This may not be seen with common disk usage utilities e.g.
 
     df -P
     Filesystem                                                     1024-blocks         Used   Available Capacity Mounted on
