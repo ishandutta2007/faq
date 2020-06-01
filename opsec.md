@@ -8,3 +8,9 @@ checking archives:
 identifying fakes:
 
  * [Fake video news debunker by InVID](https://chrome.google.com/webstore/detail/fake-video-news-debunker/mhccpoafgdgbhnjfhkcmgknndkeenfhe)
+
+identifying ip:
+
+ * [www.iplocation/](https://www.iplocation.net/) : IP2Location, ipinfo.io, DB-IP
+ * [www.ip2location](https://www.ip2location.com/)
+

@@ -109,6 +109,12 @@ update s3 acl
     aws s3api put-bucket-acl --acl public-read --bucket myBucket
     aws s3api get-bucket-acl --bucket myBucket
 
+update s3 policy
+
+    aws s3api get-bucket-policy --bucket myBucket --query Policy --output text|jsonlint --format > policy.json
+    vi policy.json
+    aws s3api put-bucket-policy --bucket myBucket --policy file://policy.json
+
 check on web
 
     curl http://myBucket.s3-eu-west-1.amazonaws.com/
@@ -163,6 +169,24 @@ get names of all images of form specyfic user
     aws ec2 describe-images --owners "847074401234" \
      | jq -r '.Images[] | "\(.OwnerId)\t\(.Name)"'
 
+list ec2 brief information
+
+    aws ec2 describe-instances --instance-id ${myInstanceId} \
+     --query 'Reservations[].Instances[].[Tags[?starts_with(Key,`ContactEmail`) == `true`],InstanceId,InstanceType,PrivateIpAddress,State.Name,Monitoring.State,LaunchTime]'
+
+list ec2 instances from given autoscaling group
+
+    aws autoscaling describe-auto-scaling-instances \
+     --query 'AutoScalingInstances[?starts_with(AutoScalingGroupName,`'${groupName}'`) == `true`].InstanceId' \
+     | jq -r '.[]'
+
+list ec2 instances by owner tag
+
+    aws ec2 describe-instances \
+     --filter Name=tag-value,Values=${myOwner} \
+     --query 'Reservations[].Instances[].[Tags[?starts_with(Key,`aws:cloudformation:stack-name`) == `true`].Value,InstanceId,InstanceType,PrivateIpAddress,State.Name,Monitoring.State,LaunchTime]'
+
+
 ##### working with cloud formation
 
 validate script
@@ -179,6 +203,29 @@ check stacks with issues
 
     aws cloudformation list-stacks --stack-status-filter CREATE_FAILED DELETE_FAILED UPDATE_ROLLBACK_FAILED ROLLBACK_COMPLETE  | egrep '"StackName"|"StackStatus"'
 
+get stack resources
+
+    aws cloudformation list-stack-resources --stack-name ${stackName}
+
+get autoscaling group
+
+    aws cloudformation list-stack-resources --stack-name ${stackName} \
+     | jq -r '.StackResourceSummaries[]|select(.ResourceType == "AWS::AutoScaling::AutoScalingGroup")|.PhysicalResourceId'
+
+list stacks by owner
+
+    stackOwner='drunken.sailor'
+    aws cloudformation describe-stacks \
+     --query 'Stacks[?Parameters[?ParameterValue == `'${stackOwner}'`]].[StackName,StackStatus,CreationTime]'
+
+
+##### working with autoscaling groups
+
+get ec2s
+
+    aws autoscaling describe-auto-scaling-groups  --auto-scaling-group-name ${autoscalingGroup} \
+     | jq -r '.AutoScalingGroups[].Instances[].InstanceId'
+
 ##### working with roles and policies
 
 lists all the managed policies that are available in your AWS account, including your own customer-defined managed policies and all AWS managed policies
@@ -193,6 +240,43 @@ lists the IAM users that have the specified path prefixi, if no path prefix is s
 
     aws iam list-users | jq '.Users[].UserName'
 
+
+##### working with monitoring
+
+specyfic metric for all groups
+
+    for autoscalingGroup in \
+     myGroup
+    do
+     echo "aws cloudwatch get-metric-statistics \
+      --namespace AWS/EC2 \
+      --metric-name CPUUtilization \
+      --dimensions Name=AutoScalingGroupName,Value=${autoscalingGroup} \
+      --statistics 'Average' 'SampleCount' \
+      --start-time  $(date --date='2 day ago' +'%FT%T%z') --end-time $(date --date='1 day ago' +'%FT%T%z') --period 300 \
+      --query 'sort_by(Datapoints,&Average)[*]'
+      #| jq -r '.Datapoints | sort_by(.Average)[]' "
+    
+     aws cloudwatch get-metric-statistics \
+      --namespace AWS/EC2 \
+      --metric-name CPUUtilization \
+      --dimensions Name=AutoScalingGroupName,Value=${autoscalingGroup} \
+      --statistics 'Average' 'SampleCount' \
+      --start-time  $(date --date='2 day ago' +'%FT%T%z') --end-time $(date --date='1 day ago' +'%FT%T%z') --period 300 \
+      --query 'sort_by(Datapoints,&Average)[*]'
+      #| jq -r '.Datapoints | sort_by(.Average)[]'
+    done
+
+Filetring by timestamp:
+
+    --query 'sort_by(Datapoints,&Timestamp)[*]'
+    # | jq -r '.Datapoints | sort_by(.Timestamp)[]'
+
+
+metric examples
+
+    --metric-name CPUUtilization --dimensions Name=AutoScalingGroupName,Value=${autoscalingGroup} --statistics 'Average' 'SampleCount'
+    --metric-name DiskWriteBytes --dimensions Name=AutoScalingGroupName,Value=${autoscalingGroup} --statistics 'Sum' 'SampleCount'
 
 ##### working with costs
 
@@ -211,7 +295,9 @@ get billing estimation
 ##### links
 
 Documentation
- * [ec2 user guide](https://github.com/awsdocs/amazon-ec2-user-guide)
+ - [ec2 user guide](https://github.com/awsdocs/amazon-ec2-user-guide)
+ - [ec2 pricing guide](https://www.ec2instances.info/)
+ - [ec2 pricing report](https://apps.cloudhealthtech.com/assets/aws/ec2/instances?table_form_submitted=true&tab=&account_type=&per_page=100&search=somename&selected_perspective=%3F+undefined%3Aundefined+%3F&selected_group=%3F+undefined%3Aundefined+%3F&selected_perspective_2=%3F+undefined%3Aundefined+%3F&aws_account_id=&aws_availability_zone_id=&is_active=Active&type=All&aws_instance_type=All&status=All&tenancy=All&is_spot=All&aws_auto_scaling_group_id=&has_tags=All&tag_key=All&launched_in=&start_before_time=&start_time=&stop_time=&stop_after_time=&pending_event=All&virtualization_type=All&hypervisor=All&report_id=#)
 
 #### Windows
 

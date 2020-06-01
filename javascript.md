@@ -32,6 +32,32 @@ Automatic gallery
     
     </html>
 
+##### debug
+
+Working with console
+
+    // debug object
+    console.log(myObject);
+
+    // debug object as a table
+    console.table(myOobject);
+
+    // colorize
+    console.todo = function(msg) {
+     console.log(' % c % s % s % s', 'color: yellow; background - color: black;', '-', msg, '-');
+    }
+    console.todo("stop 1");
+    
+    // colorize 
+    console.important = function(msg) {
+     console.log(' % c % s % s % s', 'color: brown; font - weight: bold; text - decoration: underline;', '-', msg, '-');
+    }
+    console.important("stop 1");
+
+    // get timing
+    console.time('Timer1');
+    // some code bettween
+    console.timeEnd('Timer1');
 
 ##### links
 

@@ -19,3 +19,7 @@ Better solution
     </script>
     <iframe src="some.html" style="border: none" onload="resizeIframe(this)">
     </iframe>
+
+##### Easy html to text
+
+    links -dump -width 300 [URL|file.html]

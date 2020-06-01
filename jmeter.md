@@ -103,6 +103,50 @@ To get information about latest, built-in functions use `Function Helper Dialog`
 
 ##### code samples
 
+ - access files realitive to .jmx scenario in easy way
+   File structure
+
+       .:
+       test.jmx  test-data
+       
+       ./test-data:
+       data.csv
+
+   1st config element in jmeter
+
+       BASE_DIR             ${__groovy(import org.apache.jmeter.services.FileServer; FileServer.getFileServer().getBaseDir();)}	
+       OS_FILE_SEPARATOR    ${__groovy(File.separator,)}
+       
+   2nd config element in jmeter
+
+       CSV_DIR              ${BASE_DIR}${OS_FILE_SEPARATOR}test-data${OS_FILE_SEPARATOR}
+
+   CSV dataset config filename: `${CSV_DIR}data.csv`
+
+ - check for any occurance in subsamles
+
+       import org.apache.jmeter.samplers.SampleResult;
+       
+       String assertionText = Parameters;
+       String sampleResponseData= "";
+       int assertionMatch = 0;
+       
+       SampleResult[] subSamplesResults = prev.getSubResults();
+       for (int i = 0 ; i < subSamplesResults.length ; i++){
+         sampleResponseData = subSamplesResults[i].getResponseDataAsString();
+         if (sampleResponseData.contains(assertionText)){
+           assertionMatch++;
+         }
+         //log.info("Sample numer [" + String.valueOf(i) + "]");
+         //log.info("Sample response data [" + sampleResponseData + "]");
+         //log.info("Assertion value [" + String.valueOf(assertionMatch) + "]");
+       }
+       
+       if (assertionMatch == 0){
+         AssertionResult.setFailureMessage("Text [" + assertionText + "] not found in subsamples or main sample");
+         AssertionResult.setFailure(true);
+       }
+
  - `thread group name` (e.g. `setUp`)
 
        ${__BeanShell(ctx.getThreadGroup().getName())} 
@@ -306,6 +350,8 @@ Creating jmeter dashboard report
 Converters to JMX format
 
  - http://converter.blazemeter.com/ : Convert HAR, XML, Selenium, PCAP and JSON to JMX format
+ - https://github.com/pmirek/har2jmx
+ - https://github.com/pmirek/soapui2jmx TODO
 
 
 ##### references

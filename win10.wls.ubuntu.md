@@ -58,3 +58,14 @@ Setup X-es
 Install java
 
     sudo apt install openjdk-8-jre-headless
+
+##### Password reset
+
+ * open regedit as admin 
+ * go to Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss\
+ * note down the value of `DefaultUid` and set it to 0 
+ * open linux wsl
+ * run passwd (you are a root now)
+ * close linux wsl
+ * set `DefaultUid` to previous value (usually 3e8 HEX)
+ * open linux wsl and `su -` to verify the change

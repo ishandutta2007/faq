@@ -10,6 +10,15 @@
      email = email@company.com    
 
 
+##### handling binary files
+
+    # config of ~/.gitattributes
+    *.jpg binary
+    *.png binary
+    *.gif binary
+    *.gz binary
+    *.zip binary
+
 ##### oneliners
 
     # config
@@ -17,6 +26,12 @@
     git config -l --global                     # get global config
     git config user.name '1stName 2ndName'     # set name
     git config user.email 'email@company.com'  # set email
+
+    # create repo from exising dir
+    cd newrepo
+    git init
+    git add . 
+    git commit -m 'new repo'
 
     # basic operations    
     git commit -m 'some comment' myFile   # commit my changes with comments
@@ -49,11 +64,14 @@
     git pull --rebase                          # updated to sync better with only your changes (when too many commits ahead)
     git branch -m new-name                     # change branch name
     
+    # searching for deleted files
+    git log --diff-filter=D --summary | grep delete
+
     # restoring deleted file
     git rev-list -n 1 HEAD -- <file_path>           # list last available commit with the file
     git checkout <deleting_commit>^ -- <file_path>  # checkout the version at the commit before
     git checkout $(git rev-list -n 1 HEAD -- "$file")^ -- "$file" # same as above in one command
-    
+
     # restoring for simple cases
     git reset HEAD some/path
     git checkout -- some/path
@@ -73,6 +91,34 @@
     git diff e35924b83dd8f3ff1676c6f44abe85ef6b2867bf -- host019.yaml
     git diff e35924b83dd8f3ff1676c6f44abe85ef6b2867bf HEAD host019.yaml
     git diff 86ffd0a11cd4992977ceaaeb8826cc0e74483e41 dee3f341d31adbb8706883dfa50580278a6d7ff1 host019.yaml
+
+    # getting part of repo
+    #!/bin/bash
+    DIR="repo"
+    REPO="ssh://git@git.domain.com/projectname/reponame.git"
+    BRANCH="master"
+    CHECKOUT_DIR="examples/"
+    mkdir -p ${DIR}
+    if [ -d "${DIR}" ]; then
+      cd ${DIR}
+      git archive --format=tgz --remote=${REPO} ${BRANCH} -- ${CHECKOUT_DIR} | tar zxvf -
+    fi
+
+    # cheking out part of repo
+    #!/bin/bash
+    DIR="repo"
+    REPO="ssh://git@git.domain.com/projectname/reponame.git"
+    BRANCH="master"
+    CHECKOUT_DIR="examples/"
+    mkdir -p ${DIR}
+    if [ -d "${DIR}" ]; then
+      cd ${DIR}
+      git init
+      git remote add -f origin ${REPO}
+      git config core.sparseCheckout true
+      echo ${CHECKOUT_DIR} > .git/info/sparse-checkout
+      git pull origin ${BRANCH}
+    fi
 
     
 ##### meaning of symobls ^ ~
