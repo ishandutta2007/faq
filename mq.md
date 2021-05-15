@@ -45,7 +45,7 @@ To cleanup of old no longer needed files implement in cron:
     find /var/mqm/errors -name "AMQ*.FDC" -mtime +60 -exec rm -f "{}" \;
     rm -f /var/mqm/trace/AMQ*TR* /var/mqm/trace/AMQ*.FMT
 
-based on [article](http://www-01.ibm.com/support/docview.wss?uid=swg21670876)
+based on http://www-01.ibm.com/support/docview.wss?uid=swg21670876 and https://www.ibm.com/support/pages/cleaning-ibm-mq-files
 
 ##### working with queues and managers
 

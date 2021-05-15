@@ -69,3 +69,18 @@ Install java
  * close linux wsl
  * set `DefaultUid` to previous value (usually 3e8 HEX)
  * open linux wsl and `su -` to verify the change
+
+##### Accessing linux desktop from win10
+
+On WSL side:
+
+    apt-get install xrdp xfce4
+    # you can customize port for connectivity in /etc/xrdp/xrdp.ini
+    service xrdp start
+    # check your IP to connect to and pick the right one
+    ip addr | grep 'inet '
+
+On win10 side - open rdp and connect to your box & port
+
+    mstsc.exe
+

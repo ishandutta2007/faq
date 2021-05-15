@@ -48,8 +48,38 @@ query samples
     #q=SELECT LAST("value") FROM "jmeter" where "status" = 'all'
 
 
+More complicated exmamples
+
+    q=SELECT "value"
+     FROM "autogen"."appd"
+     WHERE (
+            "metric" =~ /.*tx-dev-ecomm-dcmc2-bo.*/
+        AND "metric" =~ /.*MB.*/
+        AND "project" =~ /^Some_Project_Name/
+        AND time >= '2018-09-17T00:00:00Z'
+        AND time <= '2018-09-18T00:00:00Z'
+     )
+     GROUP BY "project","metric"
+     LIMIT 5
 
 
+##### Sample usage for creating vars and graphs in grafana
+
+Vars (based on quries to influx and refreshed for time range change):
+
+ * SELECT DISTINCT("metric") FROM (select MAX("count"), "metric" as "var" from "mydb"."autogen"."appd" WHERE $timeFilter GROUP BY "metric")
+ * SELECT DISTINCT("project") FROM (select MAX("count"), "project" as "var" from "mydb"."autogen"."appd" WHERE $timeFilter GROUP BY "project")
+ * SELECT DISTINCT("metric") FROM (select MAX("count"), "metric" as "var" from "mydb"."autogen"."appd" WHERE $timeFilter GROUP BY "metric") 
+   regex: /.*?\|(.*?)\|.*/
+   regex reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet
+ * SELECT DISTINCT("metric") FROM (select MAX("count"), "metric" as "var" from "mydb"."autogen"."appd" WHERE $timeFilter GROUP BY "metric") 
+   regex: /.*?\|.*?\|(.*)/
+   regex reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet
+
+Graphs:
+
+ * SELECT "value" FROM "autogen"."appd" WHERE ("metric" =~ /.*$host.*$metric.*/ AND "project" =~ /^$project$/) AND $timeFilter GROUP BY "metric"
+ * SELECT "value" FROM "autogen"."appd" WHERE ("metric" =~ /^${metric_full}$/ AND "project" =~ /^${project}$/) AND $timeFilter GROUP BY "project", "metric"
 
 to check
 

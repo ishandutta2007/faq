@@ -176,26 +176,31 @@ Heap dump analyais with MAT - search for a leak
 MAT: https://www.eclipse.org/mat/downloads.php
 
 
+    # get javaDir
+    source ${HOME}/env/current.cfg
+    
+    echo ''
+    date +'%F %T'
+    
     test -f "$1" || { echo "can't read file [$1], or not argument given to the command, exiting"; exit; }
     
     echo "Using heap dump: [$1]"
-    heapDumpFile="$(readlink -e $1)"
+    heapDumpFile="$(readlink -f $1)"
     heapDumpDir="$(dirname ${heapDumpFile})"
     
-    matDir="/java/MAT/latest"
+    matDir="/tools/java/MAT/latest"
     matJar=$(ls -1 ${matDir}/plugins/org.eclipse.equinox.launcher_*.jar)
     
-    test -f "${matDir}" || { echo "no MAT jar in dir [${matDir}], exiting"; exit; }
+    test -d "${matDir}" || { echo "no MAT jar in dir [${matDir}], exiting"; exit; }
     
-    ${JAVA_HOME}/bin/java -jar ${matJar} \
+    ${javaDir}/bin/java -jar ${matJar} \
       -consoleLog \
       -application org.eclipse.mat.api.parse ${heapDumpFile} \
-      -data $(dirname ${heapDumpFile})/workspace-${USER} \
-      org.eclipse.mat.api:overview \
-      org.eclipse.mat.api:suspects \
-      org.eclipse.mat.api:top_components
+      -data $(dirname ${heapDumpFile})/workspace-${USER}
+      org.eclipse.mat.api:suspects
     
     echo "Cleaning MAT files ..."
+    rm -rf workspace-${USER}
     for matFile in $(find ${heapDumpDir} -iname '*.index' -o -iname '*.threads') ; do
       echo " removing $(basename ${matFile})"
       rm ${matFile}
@@ -585,16 +590,16 @@ Automated way:
     
     #help on available options
     #JFR_OPTIONS='help'
+
+    #simple status check
+    JFR_OPTIONS='JFR.check'
+    ${MY_CMD} ${JFR_OPTIONS}
     
     #simple 10 min recording
     time='600s'
-    #JFR_OPTIONS="JFR.start duration=${time} filename=${HOME}/debug.${HOSTNAME}.${time}.jfr"
-    
-    #simple status check
-    JFR_OPTIONS='JFR.check'
-    
+    JFR_OPTIONS="JFR.start duration=${time} filename=${HOME}/debug.${HOSTNAME}.${time}.jfr"
+    MY_CMD=$(ps -ef | grep 'java ' | grep -v grep | grep ^${USER} | sed 's+/java +/jcmd +g' | awk '{print $8, $2}' | grep -v sed)
     ${MY_CMD} ${JFR_OPTIONS}
-
 
 Debug:
 

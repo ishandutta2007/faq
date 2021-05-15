@@ -113,6 +113,10 @@ Get user data e.g. to recreate password
     set long 500
     select DBMS_METADATA.GET_DDL('USER','SOME_USER') from dual;
 
+Example of hashing:
+
+    select standard_hash(concat('password','salt'), 'MD5') from dual
+
 ##### export/import
 
 Usage of expdp
@@ -123,6 +127,93 @@ Usage of expdp
      directory=DATA_PUMP_DIR \
      dumpfile=${myName}_tables.dmp \
      logfile=${myName}_tables.log
+
+##### connectivity tools
+
+sqlplus
+
+    source ${HOME}/env/current.cfg
+    
+    # RAC connection string
+    connectionString="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${db_rac_box1})(PORT=${db_rac_port1}))(ADDRESS=(PROTOCOL=TCP)(HOST=${db_rac_box2})(PORT=${db_rac_port2}))(LOAD_BALANCE=yes)(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=${db_rac_sn})))"
+    
+    echo ${connectionString}
+    ssh oracle@${db_rac_ip1} "export ORACLE_HOME=${db_home} && ${db_home}/bin/sqlplus ${db_usr}/${db_pas}@'${connectionString}'"
+
+    test -f $1 || exit 1
+    fullPath=`readlink -f $1`
+    ssh oracle@${db_rac_ip1} "export ORACLE_HOME=${db_home} && cat ${fullPath} | ${db_home}/bin/sqlplus ${db_usr}/${db_pas}@'${connectionString}'"
+
+JDBC - query from file
+
+    # get baseDir, javaDir
+    source ${HOME}/env/current.cfg
+    
+    binDir="${baseDir}/portable.env/oracle/javaClients/shellRaptor"
+    
+    dbBox="$1"
+    dbPort="$2"
+    serviceName="$3"
+    userName="$4"
+    userPass="$5"
+    test -f $6 || exit 1
+    fullPath=`readlink -f $6`
+    
+    cd "${binDir}"
+    echo " ========== [${serviceName}] ========== "
+    time cat ${fullPath} | ${javaDir}/bin/java -jar shellRaptor.jar -l "${userName}" -p "${userPass}" -u "jdbc:oracle:thin:@//${dbBox}:${dbPort}/${serviceName}"
+
+JDBC - query from string
+
+    # get baseDir
+    source ${HOME}/env/current.cfg
+    source ${baseDir}/cfg/oracle/sqlLib.cfg
+    
+    user=$1
+    box=$2
+    db_home=$3
+    db_usr=$4
+    db_pas=$5
+    connection_str=$6
+    query_var=${!7}
+    
+    # RAC connection string example
+    #connection_string="(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${db_rac_box1})(PORT=${db_rac_port1}))(ADDRESS=(PROTOCOL=TCP)(HOST=${db_rac_box2})(PORT=${db_rac_port2}))(LOAD_BALANCE=yes)(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=${db_rac_sn})))"
+    
+    echo ${connection_str}
+    ssh ${user}@${box} "export ORACLE_HOME=${db_home} && echo \"${query_var}\" | ${db_home}/bin/sqlplus ${db_usr}/${db_pas}@'${connection_str}'"
+
+
+list services
+
+    source ${HOME}/env/current.cfg
+    
+    echo ''
+    echo 'DB instances:'
+    for myInstance in ${dbInstanceList}
+    do
+     sshCmd="${db_home}/bin/srvctl status instance -d ${db_rac} -i ${myInstance} -v"
+     ssh oracle@${db_rac_ip1} ${sshCmd}
+    done
+
+validate
+
+    # get baseDir, javaDir
+    source ${HOME}/env/current.cfg
+    
+    binDir="${baseDir}/portable.env/oracle/javaClients/shellRaptor"
+    
+    dbBox="$1"
+    dbPort="$2"
+    serviceName="$3"
+    userName="$4"
+    userPass="$5"
+    
+    cd "${binDir}"
+    echo " ========== [${serviceName}] ========== "
+    time echo "${select_service_name}" | ${javaDir}/bin/java -jar shellRaptor.jar -l "${userName}" -p "${userPass}" -u "jdbc:oracle:thin:@//${dbBox}:${dbPort}/${serviceName}"
+    
+
 
 ##### links
 

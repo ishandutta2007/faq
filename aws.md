@@ -1,6 +1,12 @@
-#### Web
+#### Web usage
 
-login page for okta authentication: okta.domain.com then it redirects to aws with predefined user access, e.g. https://eu-west-1.console.aws.amazon.com/console/home?region=eu-west-1#
+okta
+
+ * login page for okta authentication: https://okta.domain.com then it redirects to aws with predefined user access, e.g. https://eu-east-1.console.aws.amazon.com/console/home?region=eu-west-1#
+
+sso
+
+ * login page: https://domain.awsapps.com/start/
 
 #### Linux
 
@@ -36,7 +42,73 @@ update env if proxy needed or multiple python env exists
     export http_proxy="http://user:pass@host.domain.com:80"
     export https_proxy="$http_proxy" ftp_proxy="$http_proxy"
 
-##### login & looking around
+##### setup of SSO for aws 2.0 client
+
+configure access:
+
+    > aws configure sso
+    SSO start URL [https://domain.awsapps.com/start/]:
+    SSO Region [us-west-1]:
+    There are 2 AWS accounts available to you.
+    Using the account ID 123766484808
+    The only role available to you is: UserAccess
+    Using the role name "UserAccess"
+    CLI default client Region [us-west-1]:
+    CLI default output format [None]:
+
+example of created config file
+
+    > cat ~/.aws/config
+    [default]
+    # Ireland
+    region = eu-west-1
+    
+    #[profile UserAccess-123766484808]
+    [profile zona]
+    sso_start_url = https://domain.awsapps.com/start/
+    sso_region = us-west-1
+    sso_account_id = 123766484808
+    sso_role_name = UserAccess
+    region = us-west-1
+
+setup login script
+
+    export PYTHONPATH=
+    export LC_ALL=en_US.utf8
+    
+    proxyUser='johny'
+    proxyPass='dee'
+    proxyHost='proxy.domain.com'
+    proxyPort='88'
+    export http_proxy=http://${proxyUser}:${proxyPass}@${proxyHost}:${proxyPort}
+    export https_proxy=${http_proxy}
+    export HTTP_PROXY=http://${proxyUser}:${proxyPass}@${proxyHost}:${proxyPort}
+    export HTTPS_PROXY=${HTTP_PROXY}
+    
+    if [[ -n "${1}" ]];then
+     echo "using profile [${1}]"
+    else
+     echo "using profile [default]"
+    fi
+    
+    aws sso login --profile $1
+    export AWS_DEFAULT_PROFILE=$1
+
+setup session script
+
+    export accountNum=$(aws sts get-caller-identity | grep Account | sed 's/",$//;s/.*"//')
+    export profile="$AWS_DEFAULT_PROFILE"
+    export roleName='UserAccess'
+    cmdOut="$(aws sts assume-role --role-arn arn:aws:iam::${accountNum}:role/${roleName} --role-session-name ${profile} --profile ${profile} | grep -E 'AccessKeyId|SecretAccessKey|SessionToken' | sed 's/^\s\+"//;s/": "/=/;s/",//')"
+    
+    echo "$cmdOut"
+    
+    export AWS_ACCESS_KEY_ID=$(echo "${cmdOut}" | grep 'AccessKeyId' | sed 's/AccessKeyId=//')
+    export AWS_SECRET_ACCESS_KEY=$(echo "${cmdOut}" | grep 'SecretAccessKey' | sed 's/SecretAccessKey=//')
+    export AWS_SESSION_TOKEN=$(echo "${cmdOut}" | grep 'SessionToken' | sed 's/SessionToken=//')
+
+
+##### login via okta
 
 login with okta, your user and password and code from Google Authenticator
 
@@ -56,6 +128,38 @@ login with okta, your user and password and code from Google Authenticator
      export AWS_SESSION_TOKEN=XXX...
 
 copy&paste printed exports to your shell
+
+automated script
+
+    export PYTHONPATH=
+    export LC_ALL=en_US.utf8
+    
+    proxyUser='johny'
+    proxyPass='dee'
+    proxyHost='proxy.domain.com'
+    proxyPort='88'
+    export http_proxy=http://${proxyUser}:${proxyPass}@${proxyHost}:${proxyPort}
+    export https_proxy=${http_proxy}
+    export HTTP_PROXY=http://${proxyUser}:${proxyPass}@${proxyHost}:${proxyPort}
+    export HTTPS_PROXY=${HTTP_PROXY}
+
+    if [[ -n "${1}" ]];then
+     echo "using profile [${1}]"
+     okta-awscli --okta-profile ${1} | tee okta.tmp.out
+    else
+     echo "using profile [default]"
+     okta-awscli --okta-profile default | tee okta.tmp.out
+    fi
+    
+    grep 'export ' okta.tmp.out | sed 's/.*export/export/g' > okta.tmp.export
+    source okta.tmp.export
+    rm okta.tmp.*
+    
+    export AWS_DEFAULT_PROFILE=$1
+    aws iam list-account-aliases
+
+
+##### looking around
 
 validate access with simple commands
 
@@ -126,6 +230,15 @@ delete a bucket
 
 
 ##### working with ec2
+
+access specific instance
+
+    ssh -i ~/.ssh/aws-key.pem awsuser@aws.route54.address.com
+
+list running instances
+
+    myInstanceName='...'
+    aws ec2 describe-instances --query "Reservations[*].Instances[*].{PublicIP:PublicIpAddress,Name:Tags[?Key=='Name']|[0].Value,Status:State.Name}" --filters "Name=instance-state-name,Values=running" "Name=tag:Name,Values='*${myInstanceName}*'"  --output table
 
 get instance status
 

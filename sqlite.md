@@ -1,6 +1,29 @@
 #### SQLite
 
-SQLite Optimization FAQ
+##### SQL examples
+
+Count empty records
+
+    SELECT count (*)
+     FROM measurement
+     WHERE
+      pm25 IS NULL
+      AND pm10 IS NULL
+      AND PM1 IS NULL
+
+Various examples
+
+    DELETE FROM measurement where fromDateTime <= '2018'
+    SELECT * FROM measurement ORDER BY fromDateTime ASC LIMIT 5
+    SELECT * FROM measurement ORDER BY fromDateTime DESC LIMIT 5
+    PRAGMA table_info(measurement)
+    SELECT name FROM sqlite_master WHERE type='table'
+    SELECT name FROM sqlite_temp_master WHERE type='table'
+    VACUUM
+
+
+##### SQLite Optimization FAQ
+
 Credits goes to Jim Lyon (jplyon@attglobal.net)
 
 10-Sep-2003

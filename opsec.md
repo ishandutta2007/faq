@@ -11,6 +11,9 @@ identifying fakes:
 
 identifying ip:
 
- * [www.iplocation/](https://www.iplocation.net/) : IP2Location, ipinfo.io, DB-IP
+ * [www.iplocation](https://www.iplocation.net/) : IP2Location, ipinfo.io, DB-IP
  * [www.ip2location](https://www.ip2location.com/)
 
+checking soft before download:
+
+ * [www.virustotal.com](https://www.virustotal.com/gui/home/url)

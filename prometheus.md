@@ -1,5 +1,22 @@
 #### Prometheus
 
+##### Querying
+
+Http, curl based query
+
+    prometheusUrl='https://prometheus.my.domain.com'
+    query='sum(rate(container_network_transmit_bytes_total{namespace=~"my-app", pod_name=~"my-app-pod.*"}[3600s]))/1024'
+    
+    http_proxy='' curl ${prometheusUrl}/api/v1/query \
+     --insecure \
+     --data-urlencode "query=$query"
+
+Http, browser based query
+
+    https://prometheus.my.domain.com/api/v1/query?query=sum(rate(container_network_transmit_bytes_total{namespace=~"my-app", pod_name=~"my-app.*"}[3600s]))/1024
+    https://prometheus.my.domain.com/api/v1/query?query=sum(rate(container_network_transmit_bytes_total{namespace=~%22my-app%22,%20pod_name=~%22my-app.*%22}[3600s]))/1024
+
+
 ##### Metrics
 
 Metric name | Type | Description | Unit (where applicable)

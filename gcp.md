@@ -61,7 +61,7 @@ configure client
 
 ##### login & looking around
 
-
+     gcloud compute instances list --format="value(name,disks[].source)"
 
 
 #### Links

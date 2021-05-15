@@ -60,3 +60,15 @@
  * stocks: `stocks:BAC` : tracks the stock price of investment portfolio
  * weather: `weather:brighton`: results for Brighton pages on weather websites, as well as a little weather widget at the top of the results page.
 
+
+##### Cheking for non-existing pages
+
+Use google cache for this, e.g.
+
+ * https://webcache.googleusercontent.com/search?q=cache:https%3A%2F%2Fgoogle.com
+
+##### Checking trends
+
+Use google to check intrest and geolocations of searches
+
+ * https://trends.google.com/trends/explore?geo=PL&q=niebezpiecznik

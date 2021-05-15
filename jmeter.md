@@ -173,6 +173,10 @@ To get information about latest, built-in functions use `Function Helper Dialog`
 
        ${__javaScript(vars.getIteration())}
 
+ - play with JSR223 sampler and basic actions from https://jmeter.apache.org/api/org/apache/jmeter/samplers/SampleResult.html
+
+       SampleResult.setResponseData("TEST", "UTF-8");
+       SampleResult.setResponseOK();
         
  - update result according to required conditions in post processor (JSR223 is recommended + groovy, when you can simple code in Java)
 
@@ -312,7 +316,7 @@ The order of appearance of columns is fixed, and is as follows:
  -  IdleTime - number of milliseconds of 'Idle' time (normally 0)
  -  Variables, if specified
 
-based on [manual](https://jmeter.apache.org/usermanual/listeners.html)
+based on [manual](https://jmeter.apache.org/usermanual/listeners.html#csvlogformat)
 
 More details on meaning:
 
@@ -324,13 +328,30 @@ based on [glossary](https://jmeter.apache.org/usermanual/glossary.html)
 
 Sample:
 
-     timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,?,?,?
-     1529489572162,3,case1,200,OK,case1.payloads 3-12,text,false,,0,0,25,96,0,0,0
+    timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,?,?,?
+    1529489572162,3,case1,200,OK,case1.payloads 3-12,text,false,,0,0,25,96,0,0,0
 
 Sample of issues with connecion:
 
-     1545389889931,96,sampler1,200,,threadG1 1-8,text,true,,88464,460595,10,10,http://test.com,95,0,22
-     1545390165650,3272,sampler1,200,,threadG1 1-5,text,true,,88464,460595,10,10,http://test.com,3271,0,3117
+    1545389889931,96,sampler1,200,,threadG1 1-8,text,true,,88464,460595,10,10,http://test.com,95,0,22
+    1545390165650,3272,sampler1,200,,threadG1 1-5,text,true,,88464,460595,10,10,http://test.com,3271,0,3117
+
+Logging details with JSR sampler (more details @ https://www.pushbeta.com/2019/10/18/jmeter-logging-the-full-request-for-non-gui-access/)
+
+    try{
+      var message = "";
+      var currentUrl = sampler.getUrl();
+      message +=  ". URL = " +currentUrl;
+      var requestBody = sampler.getArguments().getArgument(0).getValue();
+      message += " --data " + sampler.getArguments();
+    
+      if(!sampleResult.isSuccessful()){
+          log.error(message);
+      }
+    
+    }catch(err){
+      //do nothing. this could be a debug sampler. no need to log the error
+    }
 
 ##### reports
 
@@ -343,7 +364,9 @@ Creating jmeter dashboard report
       -j "${outputDir}/jmeter/`basename ${jmeterCsvResultLog}`.report.log" \
       -J jmeter.reportgenerator.temp_dir="${outputDir}/jmeter/"
 
+Exmaple of usage for log with over 1 million lines
 
+    java -Xms32g -Xmx32g -XX:NewRatio=1 -XX:-UseAdaptiveSizePolicy -server -jar ApacheJMeter.jar -g /tmp/jmeter.log.csv -o /tmp/report 
 
 ##### utilities
 

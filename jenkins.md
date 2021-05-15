@@ -16,6 +16,21 @@
  * user config: https://${jenkinsUrl}/user/user-name/configure
 
 
+##### cli
+
+Get jenkins client:
+
+    wget --no-check-certificate ${jenkinsUrl}/jnlpJars/jenkins-cli.jar
+
+Exmaples
+
+    # list job
+    java -jar jenkins-cli.jar -s "${jenkinsUrl}" -auth ${jenkinsUser}:{jenkinsPass} list-jobs
+
+    # export job
+    java -jar jenkins-cli.jar -s "${jenkinsUrl}" -auth ${jenkinsUser}:{jenkinsPass} get-job some-job > some-job.xml
+    
+
 ##### api
 
 

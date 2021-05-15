@@ -23,3 +23,21 @@ Note: removes EOL from all lines except the ones where pattern '<\/ATQ>#&#' is s
     else
      echo "missing input file [${input}]"
     fi
+
+Calculating difference
+
+    #!/bin/bash
+    
+    #compares two columns
+    myFile=$1
+    
+    #calculate diff
+    awk '
+    {
+     if ($1!=0){
+      printf "|%.2f|%.2f|%.2f|\n",$1,$2,(($2-$1)/$1);
+     }else{
+      printf "|%.2f|%.2f|n/a|\n",$1,$2;
+     }
+    }' ${myFile}
+

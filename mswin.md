@@ -64,6 +64,9 @@ List DC in domain
 
     nltest /dclist:domain
 
+Show wifi details and password
+
+    netsh wlan show profile WIFINETNAME key=clear
 
 ##### working with disks
 
@@ -318,3 +321,14 @@ If these are not part of a cluster, than an alternative is to make a SAN polic
     DiskPart successfully onlined the selected disk.
 
 based on [article](https://ss64.com/nt/diskpart.html)
+
+##### debugging
+
+Install debugging kit
+
+ * Download the WinDBG sdksetup.exe setup file
+ * set only 'Debugging Tools for Window' to install when installer runs
+ * run cmd as admin, then 'cd \Program Files (x86)\Windows Kits\10\Debuggers\x64\' and 'windbg.exe -IA', this will register file extensions handling
+ * open WinDBG panel, go to 'File > Symbol File Path' and set it as 'SRV*C:\SymCache*http://msdl.microsoft.com/download/symbols'
+ * save changes with 'File > Save WorkSpace'
+ * copy any .dmp from 'C:\Windows' or 'C:\Windows\Minidump' and open it with WinDBG

@@ -95,4 +95,8 @@ Both crf <q-value> and b:v <bitrate> MUST be provided. In this mode, bitrate con
 For easy videos, this mode behaves exactly like the constant quality mode, and the actual bitrate achieved can be much lower than the specified bitrate in the b:v parameter.
 One caveat in FFMpeg is that if you do not provide the b:v parameter, FFMpeg will assume a default target bitrate of 256K -- so the constrained quality mode will be triggered with a potentially very low target bitrate.
 
+##### oneliners
+
+    # concatenate m3u8 video stream
+    ffmpeg -i "https://127.0.0.1/mystream.m3u8" -c copy -bsf:a aac_adtstoasc "output.mp4"
 

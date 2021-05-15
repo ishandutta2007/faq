@@ -1,6 +1,5 @@
 #### GIT
 
-
 ##### config file
 
     # content of ~/.gitconfig
@@ -149,3 +148,35 @@ When using mobaxterm git clone is not wroking, use standard git/bash shortuc pro
     git config --global core.eol=lf           # dealing with endOfLines
     git config --global core.autocrlf=input   # dealing with endOfLines
     
+
+##### reports for git
+
+Current month
+
+    #repoRoot="~/git/current_code"
+    #author='LastN, FirstN'
+    
+    reposRoot="$1"
+    author="$2"
+    
+    for repoRoot in $(find ${reposRoot}  -mindepth 1 -maxdepth 1 -type d)
+    do
+     echo ""
+     echo ".................... [${repoRoot}] ...................."
+     cd ${repoRoot}
+     git log --shortstat --date=short --format='NEW_LINE%ad#%s#%H'  --author="${author}" --after=$(date +'%Y.%m.01') --before=$(date --date='1 day' +'%Y.%m.%d') . | tr -d '\n' | sed 's/NEW_LINE/\n/g' | sort | column -t -s'#'
+    done
+
+Previous month
+
+    reposRoot="$1"
+    author="$2"
+    
+    for repoRoot in $(find ${reposRoot}  -mindepth 1 -maxdepth 1 -type d)
+    do
+     echo ""
+     echo ".................... [${repoRoot}] ...................."
+     cd ${repoRoot}
+     git log --shortstat --date=short --format='NEW_LINE%ad#%s#%H'  --author="${author}" --after=$(date --date '1 month ago' +'%Y.%m.01') --before=$(date +'%Y.%m.01') . | tr -d '\n' | sed 's/NEW_LINE/\n/g' | sort | column -t -s'#'
+    done
+

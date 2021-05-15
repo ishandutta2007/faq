@@ -82,7 +82,15 @@ Working with files
   
  * Adds right click context menu to show selected text or hyperlink file content in Json Editor in new tab
    [Json Viewer Editor](https://chrome.google.com/webstore/detail/json-viewer-editor/emlglgogdlkgaepogbphgkdlpdlchdgg)
+
    
+Networking
+
+ * Shows the external&internal IP addresses
+   [Show My IP Addresses (External and Local)](https://chrome.google.com/webstore/detail/show-my-ip-addresses-exte/opljiobgnagdjikipnagigiacllolpaj)
+
+ * Display Website Country Flag. Website Whois - # of Visitors visiting, Reputation Reviews, Antivirus Check, Alexa, Incognito
+   [IP Whois & Flags Chrome & Websites Rating](https://chrome.google.com/webstore/detail/ip-whois-flags-chrome-web/kmdfbacgombndnllogoijhnggalgmkon)
 
 Utils
 
