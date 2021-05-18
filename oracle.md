@@ -72,6 +72,64 @@ Check what's available on the box:
     | sort -k6,1 -n \
     | awk 'BEGIN {sum=0}; {sum=sum+$6;print$0} END {print "TOTAL disk space available[G]:",sum}'
 
+
+##### AWRs 
+
+Basic SQLs/functions for working with AWRs
+
+    select_service_name="select sys_context( 'userenv', 'service_name' ) as service_name from dual;"
+    select_version='select * from v$version;'
+    
+    --#################################################
+    list_awr_settings="
+    --set lines 100 pages 999
+    --describe dba_hist_wr_control;
+    SELECT
+     '['  || dbid          || '] ' ||
+     ' [' || retention     || '] ' ||
+     ' [' || snap_interval || '] ' ||
+     ' [' || topnsql       || ']'
+    FROM dba_hist_wr_control;
+    "
+    
+    --#################################################
+    list_awr_snapshots="
+    set lines 100 pages 999
+    
+    select * from
+     (
+      select
+       snap_id,
+       dbid,
+       instance_number,
+       snap_level,
+       to_char(begin_interval_time, 'dd/mm/yy hh24:mi:ss') begin,
+       to_char(end_interval_time, 'dd/mm/yy hh24:mi:ss') end
+      from
+       dba_hist_snapshot
+      order by 1 desc
+     )
+    where rownum<20;
+    
+    --------------------
+    -- dba_hist_snapshot
+    --------------------
+    -- SNAP_ID                                   NOT NULL NUMBER
+    -- DBID                                      NOT NULL NUMBER
+    -- INSTANCE_NUMBER                           NOT NULL NUMBER
+    -- STARTUP_TIME                              NOT NULL TIMESTAMP(3)
+    -- BEGIN_INTERVAL_TIME                       NOT NULL TIMESTAMP(3)
+    -- END_INTERVAL_TIME                         NOT NULL TIMESTAMP(3)
+    -- FLUSH_ELAPSED                                      INTERVAL DAY(5) TO SECOND(1)
+    -- SNAP_LEVEL                                         NUMBER
+    -- ERROR_COUNT                                        NUMBER
+    -- SNAP_FLAG                                          NUMBER
+    -- SNAP_TIMEZONE                                      INTERVAL DAY(0) TO SECOND(0)
+    "
+    
+    --#################################################
+    
+
 ##### users and accounts
 
 Unlock user and fix password expiration time

@@ -604,6 +604,7 @@ C:
 
    Way to compile scripts from /opt/mqm/samp
 
+
        // As example let's change buffer size from MQBYTE   buffer[65536]  to MQBYTE   buffer[1048576] to accomodate bigger messages
        // Current location:  host01.domain.com :/opt/mqm/samp.username/username
    
@@ -626,8 +627,27 @@ C:
        # -l library
        #  Search the library named library when linking
 
+   Sample patch
 
-   Sample usage:
+       88c88,89
+       <    MQBYTE   buffer[65536];          /* message buffer                */
+       ---
+       >    /* increasing buffer */
+       >    MQBYTE   buffer[1048576];        /* message buffer                */
+       186c187,189
+       <    gmo.WaitInterval = 15000;          /* 15 second limit for waiting */
+       ---
+       >    /* icreasing time limit */
+       >    /*gmo.WaitInterval = 15000;          15 second limit for waiting */
+       >    gmo.WaitInterval = 900000;          /* 15 minutes limit for waiting */
+
+   Sample patching
+
+       patch amqsget0.c -i amqsget0.c.patch -o amqsget0.c.updated
+       mv amqsget0.c amqsget0.c.old
+       mv amqsget0.c.updated amqsget0.c
+
+   Sample code usage:
 
        //export MQSERVER='CHANNEL.TEST.A/TCP/mq75.domain.com(7777)
        #include <stdio.h>
