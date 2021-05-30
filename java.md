@@ -1,5 +1,16 @@
 #### Java
 
+##### Downloading JDK without login
+
+Use link provided when trying to get it from web page
+
+    https://download.oracle.com/otn/java/jdk/8u291-b10/d7fc238d0cbf4b0dac67be84580cfb4b/jdk-8u291-linux-x64.tar.gz
+
+And modify it a bit and use cookie
+
+    wget --header='Cookie: oraclelicense=accept-securebackup-cookie' \
+     https://download.oracle.com/otn-pub/java/jdk/8u291-b10/d7fc238d0cbf4b0dac67be84580cfb4b/jdk-8u291-linux-x64.tar.gz
+
 ##### Decompiling classes
 
 GUI:

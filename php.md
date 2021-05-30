@@ -40,3 +40,53 @@ check users
     check_atts_func ('~/data/inventory.csv', array('user1','not_set'));
     ?>
 
+upload file, part 1
+
+    //upload.php
+    <html>
+    <head></head>
+    <body>
+    <h4> File uploads </h4>
+    <form enctype="multipart/form-data" action="upload.info.php"
+            method="post">
+    <p>
+    Select File:
+    <input type="file" size="35" name="uploadedfile" />
+    <br />
+    
+    <!--Destination
+    <input type="text" size="35" name="destination"
+           value= "<?php echo $_ENV["USER"];?>" />
+    <br />
+    -->
+    <input type="submit" name="Upload" value="Upload" />
+    </p>
+    </form>
+    </body>
+    </html>
+
+upload file, part 2
+
+    //upload.info.php
+    <?php
+    
+    //$destination_path = $_REQUEST["destination"] . "/";
+    //$target_path = "/tmp/" . $destination_path;
+    //$target_path = $target_path . basename( $_FILES['uploadedfile']['name']);
+    $target_path = "/tmp/" . basename( $_FILES['uploadedfile']['name']);
+    
+    echo "User=" .          $_ENV[USER] . "<br />";
+    echo "Source=" .        $_FILES['uploadedfile']['name'] . "<br />";
+    //echo "Destination=" .   $destination_path . "<br />";
+    echo "Target path=" .   $target_path . "<br />";
+    echo "Size=" .          $_FILES['uploadedfile']['size'] . "<br />";
+    //echo "Tmp name=" .    $_FILES['uploadedfile']['tmp_name'] . "<br />";
+    
+    
+    if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+        echo "The file ".  basename( $_FILES['uploadedfile']['name']).
+        " has been uploaded";
+    } else{
+        echo "There was an error uploading the file, please try again!";
+    }
+    ?>
