@@ -1,6 +1,13 @@
-#### Jmeter
+#### JMeter
 
-##### envionment
+##### compiling
+
+Usual flow:
+
+    ./gradlew runGui
+    ./gradlew createDist
+
+##### environment
 
 Resources
 
@@ -48,7 +55,11 @@ Test jmeter regular expression before use
 
     http://www.regexplanet.com/advanced/java/index.html
 
+##### plugin dependencies
 
+Plugin related jars for jmeter-plugins.org:
+
+    https://github.com/undera/jmeter-plugins/search?q=guava-19.0.0
 
 ##### performance
 
@@ -359,7 +370,7 @@ Creating jmeter dashboard report
 
      ${JAVA_HOME}/bin/java \
       -jar "${JMETER_HOME}/bin/ApacheJMeter.jar" \
-      -g "${ResultLog}" \
+      -g "${jmerteCsvResultLog}" \
       -o "${outputDir}/jmeter/`basename ${jmeterCsvResultLog}`.html" \
       -j "${outputDir}/jmeter/`basename ${jmeterCsvResultLog}`.report.log" \
       -J jmeter.reportgenerator.temp_dir="${outputDir}/jmeter/"

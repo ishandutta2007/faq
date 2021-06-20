@@ -84,3 +84,22 @@ On win10 side - open rdp and connect to your box & port
 
     mstsc.exe
 
+##### Issues with DNS for VPN
+
+Create /etc/wsl.conf file.
+
+    [network]
+    generateResolvConf = false
+
+Remove /etc/resolv.conf linked to nothing?
+Create valid /etc/resolv.conf with content like
+
+    # ouput of Get-DnsClientServerAddress from power shell
+    search your.domain.com
+    nameserver 192.168.1.1
+    nameserver 10.12.1.1
+    nameserver 8.8.8.8
+
+Restart WLS
+
+   Get-Service LxssManager | Restart-Service

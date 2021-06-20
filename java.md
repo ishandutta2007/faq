@@ -11,6 +11,12 @@ And modify it a bit and use cookie
     wget --header='Cookie: oraclelicense=accept-securebackup-cookie' \
      https://download.oracle.com/otn-pub/java/jdk/8u291-b10/d7fc238d0cbf4b0dac67be84580cfb4b/jdk-8u291-linux-x64.tar.gz
 
+##### Listing jar content
+
+Jar
+
+    jar tf some-lib.jar
+
 ##### Decompiling classes
 
 GUI:
