@@ -140,6 +140,72 @@ To ensure you capture all results, include both sets of syntax:
 
 based on [document](https://docs.ca.com/en-us/ca-agile-central/saas/use-grid-app-queries)
 
+#### Rally api examples
+
+You need to create read only api access key to use this scripts (https://rally1.rallydev.com/login/accounts/index.html#/keys)
+
+Get project details:
+
+    server='rally1.rallydev.com'
+    projectName='Some project'
+    fetch='true'
+    query='(Name contains "'${projectName}'")'
+    
+    curl --silent \
+     --get \
+     --header "zsessionid: ${roApiKey}" \
+     --data-urlencode "query=${query}" \
+     --data-urlencode "fetch=${fetch}" \
+     https://${server}/slm/webservice/v2.0/project \
+     | jq '.'
 
 
+Get schema details for known project:
+
+    server='rally1.rallydev.com'
+    projectId='123456789012'
+    
+    curl --silent \
+     --location \
+     --header "zsessionid: ${roApiKey}" \
+     https://rally1.rallydev.com/slm/schema/v2.0/project/${projectId}
+
+Get specific use cases:
+
+    server='rally1.rallydev.com'
+    prjName='Some project'
+    usName='Some name'
+    usState='Completed'
+    query='( ( ( Name = "'"${usName}"'" ) and ( Project.Name = "'"${prjName}"'" ) ) and ( ScheduleState = "'"${usState}"'" ) )'
+    fetch='TeamFeature,Name,FormattedID,CreatedBy,Description,Notes'
+    jqFilter='.QueryResult.Results[] | .FormattedID + " (" + .TeamFeature.FormattedID + ", " + .TeamFeature.Name + ", " + .CreatedBy._refObjectName + ") # " + .Description + " ; " + .Notes'
+    
+    curl --silent \
+     --get \
+     --header "zsessionid: ${roApiKey}" \
+     --data-urlencode "fetch=${fetch}" \
+     --data-urlencode "query=${query}" \
+     https://${server}/slm/webservice/v2.0/HierarchicalRequirement \
+     | jq "${jqFilter}"
+    
+Get user's default project:
+
+    server='rally1.rallydev.com'
+    fetch='DefaultProject'
+    query='( username = "some.user@domain.com" )'
+    
+    curl \
+     --silent \
+     --get \
+     --header "zsessionid: ${roApiKey}" \
+     --data-urlencode "query=${query}" \
+     --data-urlencode "fetch=${fetch}" \
+     https://${server}/slm/webservice/v2.0/user \
+     | jq '.QueryResult.Results[].DefaultProject | ._refObjectName + " - " + ._ref'
+    
+References:
+
+ * https://rally1.rallydev.com/slm/doc/webservice/
+ * https://knowledge.broadcom.com/external/article/125586/rally-wsapi-best-practices-on-filterin.html
+ * https://community.broadcom.com/enterprisesoftware/communities/community-home/digestviewer/viewthread?MessageKey=75c85cf9-66d5-4cc0-9059-7d55f8a35173&CommunityKey=f303f769-8d4c-44d9-924c-3845bba6444e&tab=digestviewer* 
 

@@ -39,6 +39,10 @@
     # get master node IP
     kubectl -n myNs get node -o json | jq -r '.items[] | select (."metadata"."labels"."node-role.kubernetes.io/master" == "master") | ."status"."addresses" | .[] | select (."type" == "InternalIP")."address"'
 
+    # get some picked pod data (name, ip, ports)
+    podData=$(kubectl -n namspace get pod -l "app=wiremock" --output 'custom-columns=NAME:metadata.name,POD_IP:status.podIP,PORTS:spec.containers[0].ports[*].containerPort')
+    podData=$(kubectl -n namespace get pod -l "app=wiremock" -o jsonpath='{range .items[*]}{.metadata.name} {.status.podIP} {.spec.containers[0].ports[?(.name=="http")].containerPort} {.spec.containers[0].ports[?(.name=="jmx")].containerPort}{"\n"}')
+
 ##### sample setup
 
 Single pod from docker image
@@ -76,6 +80,19 @@ Single pod from docker image
     # remove image not needed
     docker image rm 0e2fcbe166e7
 
+Configurtion
+
+    # use config from multiple files
+    export KUBECONFIG=$(readlink -f $HOME/.kube/config.*| xargs -I'{}' echo -n '{}':)
+    kubectl config get-contexts
+
+Utils
+
+    # auto-completion
+    apt-get install bash-completion
+    kubectl completion bash > ~/.kube/bash.completion
+    source ~/.kube/bash.completion
+
 Deployment from file based on docker image (https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 
 httpbin-deployment.yaml
@@ -105,7 +122,7 @@ httpbin-deployment.yaml
             ports:
             - containerPort: 80
 
-httpbin-service.html
+httpbin-service.yaml
 
     kind: Service
     apiVersion: v1

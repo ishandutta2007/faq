@@ -17,3 +17,10 @@ recreate repository without commits history
     git branch -D master
     git branch -m master
     git push -f origin master
+
+##### getting part of repo
+
+you can use SVN to get only part of whole repo, e.g.
+
+    svn export https://github.com/grpc/grpc.git/trunk/examples/protos/
+

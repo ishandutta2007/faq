@@ -4,11 +4,9 @@ Utility script to run flux queries
 
     query="$(cat influx.query.flux | grep -v '#' | tr -d '\n')"
     echo http_proxy='' curl ${influxUrl}/api/v2/query -XPOST -sS \
-     -H 'accept:application/csv' \
      -H 'content-type:application/vnd.flux' \
      -d "'${query}'"
     http_proxy='' curl ${influxUrl}/api/v2/query -XPOST -sS \
-     -H 'accept:application/csv' \
      -H 'content-type:application/vnd.flux' \
      -d "${query}"
 
@@ -70,3 +68,68 @@ Get average response time
      |> map(fn: (r) => ({avgRt: r.totalTime/r.totalCount}) )
      |> yield(name: "avgRt")
 
+Get unique list of column values
+
+    from(bucket: "myBucket")
+     |> range(start: 2019-11-04T21:03:28Z, stop: 2019-11-04T21:13:32Z)
+     |> filter(fn: (r) =>  r._measurement == "monitoring" and r.App == "coolApp")
+     |> keep(columns: ["Service"])
+     |> unique(column: "Service")
+     |> map(fn: (r) => ({_value: r.Service}))
+
+Using wget intead of curl
+
+    wget -O - ${influxUrl}/query?db=myDb --post-data "q=SHOW MEASUREMENTS"
+    wget -O - ${influxUrl}/api/v2/query --header 'content-type:application/vnd.flux' --post-data 'from(bucket: "myDb") |> range(start: 2021-01-01T00:00:00Z, stop: 2021-01-02T00:00:00Z) |> yield()'
+
+Samples of InfluxQL vs flux
+
+    # InfluxQL:
+    SHOW TAG VALUES WITH KEY="Site"
+
+    #Flux:    
+    from(bucket: "mybucket")
+     |> range(start: v.timeRangeStart)
+     |> keyValues(keyColumns: ["Site"])
+     |> group()
+
+Importing flux data back to influxDb via grafana
+
+Tool for convertion to line protocol: https://github.com/mispdev/csv2lp
+
+
+    grafanaHost='http://grafana.domain.com'
+    influxDbId='111'
+    range='start: 2021-12-13T14:21:10Z, stop: 2021-12-13T15:22:13Z'
+    measurement='custom.googleapis.com'
+    influxDbBucket='myDb'
+
+    allMeasurementData='
+    from(bucket: "'${influxDbBucket}'")
+     |> range('"${range}"')
+     |> filter(fn: (r) => r._measurement =~ /'"${measurement}"'/)
+     |> yield()
+    '
+
+    fluxQuery="${allMeasurementData}"
+
+    curl -k -L -sS \
+     -H 'content-type:application/vnd.flux' \
+     ${grafanaHost}/api/datasources/proxy/${influxDbId}/api/v2/query \
+     -XPOST -d "${fluxQuery}" \
+     > import.csv
+
+    /opt/csv2lp/csv2lp import.csv > import.lp
+    gzip import.lp
+
+    influxDbId='123'
+    influxDbBucket='myDb'
+    
+    # send gzip data from flux query
+    curl -k -L -sS \
+     -X POST "${grafanaHost}/api/datasources/proxy/${influxDbId}/api/v2/write?bucket=${influxDbBucket}" \
+     -H "Content-Encoding: gzip" \
+     -H "Content-Type: text/plain; charset=utf-8" \
+     -H "Accept: application/json" \
+     --data-binary @import.lp.gz
+    fi

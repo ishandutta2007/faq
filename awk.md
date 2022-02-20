@@ -24,6 +24,10 @@ Note: removes EOL from all lines except the ones where pattern '<\/ATQ>#&#' is s
      echo "missing input file [${input}]"
     fi
 
+Calculating average for some column
+
+    awk -F ',' 'BEGIN {sum=0}; {sum=sum+$2}; END {print sum/NR}' some-file.csv
+
 Calculating difference
 
     #!/bin/bash

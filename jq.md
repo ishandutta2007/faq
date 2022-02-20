@@ -57,3 +57,15 @@ Moving csv into json with jq
       }
     ]
 
+Formatting output:
+
+     curl -v -k -s http://jenkins.company.com/job/myJob/lastBuild/api/json \
+      | jq -r '(.actions[0].parameters[] | select(.name=="BRANCH").value) + " | " + (.number|tostring) + " | " + (.duration/1000/3600 | floor | tostring) + "h" + (.duration/1000%3600/60 | floor | tostring) + "m" + (.duration/1000%60 | tostring) + "s"  + " | " + .result + " |"')
+
+     curl -s http://server.company.com/api/json/v0/test/12345/import_log \
+      | jq -r '.payload .recorded_data[] | select(.value!=null) | .metric + " " +(.value *1000.0 + 0.5|floor/1000.0 |tostring)'
+
+References:
+
+ * https://stedolan.github.io/jq/manual/
+ * https://earthly.dev/blog/jq-select/ 

@@ -11,6 +11,11 @@ And modify it a bit and use cookie
     wget --header='Cookie: oraclelicense=accept-securebackup-cookie' \
      https://download.oracle.com/otn-pub/java/jdk/8u291-b10/d7fc238d0cbf4b0dac67be84580cfb4b/jdk-8u291-linux-x64.tar.gz
 
+Automated way:
+
+    export latestJdk8=$(curl -s https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html | grep 'linux-x64.tar.gz' | sed "s/' data-license.*//;s/.*data-file='//;s/otn/otn-pub/")
+    wget --header='Cookie: oraclelicense=accept-securebackup-cookie' "${latestJdk8}"
+
 ##### Listing jar content
 
 Jar
@@ -27,6 +32,17 @@ Command line:
 
     ./jad HelloWorld.class
     java -jar procyon-decompiler-0.5.30.jar com.samples.HelloWorld
+
+
+##### GC logs
+
+Enable logging JVM 8
+
+    -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintGCCause -Xloggc:/tmp/java8.gc.log
+
+Enable logging JVM 11
+
+    -Xlog:gc=debug:file=/tmp/java11.gc.log:utctime,uptime,level -XX:NativeMemoryTracking=summary 
 
 ##### Regular expressions
 
@@ -785,3 +801,21 @@ Debug class content
     JAVA_HOME='/opt/java/x86-GNU_Linux_64bit/jdk1.7.0_60'
     #note, looks like symlinks are not accepted here
     ${JAVA_HOME}/bin/javap -classpath .:/lib/some.jar com.domain.class.path.MyClass | sed 's/).*/)/'
+
+##### java 11 debug tools
+
+based on data from: https://docs.oracle.com/en/java/javase/11/troubleshoot/diagnostic-tools.html
+
+##### references
+
+JVM internals
+ * https://developers.redhat.com/articles/2021/08/20/stages-and-levels-java-garbage-collection
+ * https://developers.redhat.com/articles/2021/09/09/how-jvm-uses-and-allocates-memory
+ * https://developers.redhat.com/articles/2021/11/02/how-choose-best-java-garbage-collector?sc_cid=7013a000002pxeoAAA 
+ * https://developers.redhat.com/articles/2021/10/29/beginners-attempt-optimizing-gcc?sc_cid=7013a000002pxeoAAA
+ * https://docs.pega.com/pega-predictive-diagnostic-cloud/jvm-monitoring-landing-page-pega-predictive-diagnostic-cloud
+ * http://www.fasterj.com/articles/oraclecollectors1.shtml - types of GC
+
+Common issues
+ * https://devops.egyan.space/common-issues-troubleshooting-in-weblogic/
+ * https://stackify.com/memory-leaks-java/

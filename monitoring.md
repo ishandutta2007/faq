@@ -58,3 +58,7 @@ Alternative way for remote process
 
     # send data locally from hostX to remote file on hostY
     jstat -gcutil -t 32497 1000 3600 | nc hostY 10001
+
+Monitoring on github:
+ * https://github.com/micrometer-metrics/micrometer/archive/refs/heads/main.zip
+ * https://github.com/sematext/sematext-agent-integrations

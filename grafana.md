@@ -112,3 +112,72 @@ Minimal setup for a dashboard
     #delete snapshot
     #snapshotKey='sM8wZeaEHbhyNVFl3hcuOmRA5ZAE06Cv'
     #$HOME_DIR_OC/oc -c grafana rsh ${grafanaPod} curl ${curlDeleteOpt} http://localhost:3000/api/snapshots/${snapshotKey}
+
+Interacting with datasources
+
+    host='grafana.domain.com'
+    authBearer='AbCdE'
+    authBasic="user:user"
+    #endpoint='api/dashboards/home'
+    #endpoint='api/datasources'
+    #endpoint='api/datasources/name/influx_app_flux'
+    
+    # VALIDATION
+    #influxEndpoint='health'
+
+    # INFLUX SQL
+    #influxEndpoint='query?db=myDb&q=SHOW%20MEASUREMENTS'
+    #influxEndpoint='query?db=myDb&q=SHOW%20FIELD%20KEYS%20FROM%20"jmeter"'
+
+    # FLUX
+    #influxEndpoint='api/v2/query'
+    #fluxQuery='from(bucket:"myDb") |> range(start: 2021-09-21T12:00:00Z, stop: 2021-09-21T12:00:01Z) |> filter(fn: (r) => r._measurement == "jmeter") |> yield()'
+
+    #endpoint="api/datasources/proxy/3/${influxEndpoint}"
+
+    #set -x
+
+    #curl -H "Authorization: Bearer ${authBearer}" ${host}/${endpoint}
+    #curl -H 'content-type:application/vnd.flux' -H "Authorization: Bearer ${authBearer}" ${host}/${endpoint} -XPOST -sS -d "${fluxQuery}"
+
+    #curl -s "${authBasic}@${host}/${endpoint}"
+    #curl -H 'content-type:application/vnd.flux' "${authBasic}@${host}/${endpoint}" -XPOST -sS -d "${fluxQuery}"
+
+Variables
+
+Samples for dynamic flux query
+
+    # Flux
+    from(bucket: "myBucket")
+     |> range($range)
+     |> filter(fn: (r) =>  r._measurement == "monitoring" and r.App == "myApp")
+     |> keep(columns: ["Service"])
+     |> unique(column: "Service")
+     |> map(fn: (r) => ({_value: r.Service}))
+
+    # Flux
+    from(bucket: "myBucket")
+     |> range($range)
+     |> filter(fn: (r) => r._measurement == "k8s")
+     |> keep(columns: ["container"]) 
+     |> map(fn: (r) => ({_value: r.container}))
+     |> unique()
+
+    #InfluxQL
+    select DISTINCT(var::string)
+     FROM (
+      select MAX("cpu"), namespace as var from "myNamespace"."autogen"."k8s"
+      WHERE $timeFilter
+      GROUP BY namespace
+     )
+
+    #InfluxQL
+    SHOW TAG VALUES WITH KEY="Environment" WHERE Site =~ /$Site_Name/
+
+    #Flux
+    from(bucket: "mybucket")
+     |> range(start: v.timeRangeStart)
+     |> filter(fn: (r) => contains(value: r["Site"], set: ${Site_Name:json}))
+     |> keyValues(keyColumns: ["Environment"])
+     |> group()
+

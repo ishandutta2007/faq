@@ -6,7 +6,7 @@ show databases
 
     influx -execute 'SHOW DATABASES'
 
-##### working on db vi http api (http://host:8086)
+##### working on db via http api (http://host:8086)
 
 basic oneliners
 
@@ -48,7 +48,7 @@ query samples
     #q=SELECT LAST("value") FROM "jmeter" where "status" = 'all'
 
 
-More complicated exmamples
+More complicated examples
 
     q=SELECT "value"
      FROM "autogen"."appd"
@@ -90,4 +90,10 @@ to check
  * /query
  * /write
 
+##### resources
 
+Some internals
+
+ * https://www.influxdata.com/blog/influxdb-internals-101-part-one/
+ * https://www.influxdata.com/blog/influxdb-internals-101-part-two/
+ * https://www.influxdata.com/blog/tldr-influxdb-tech-tips-optimizing-flux-performance-in-influxdb-cloud/

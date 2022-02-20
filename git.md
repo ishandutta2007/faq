@@ -32,6 +32,9 @@
     git add . 
     git commit -m 'new repo'
 
+    # clone specyfic branch
+    git clone --branch 9.9.7 ssh://git@git.domain.com/depo/prj.git
+
     # basic operations    
     git commit -m 'some comment' myFile   # commit my changes with comments
     git reset HEAD~1                      # cancel last commit
@@ -96,7 +99,7 @@
     DIR="repo"
     REPO="ssh://git@git.domain.com/projectname/reponame.git"
     BRANCH="master"
-    CHECKOUT_DIR="examples/"
+    CHECKOUT_DIR="examples/example1/"
     mkdir -p ${DIR}
     if [ -d "${DIR}" ]; then
       cd ${DIR}
@@ -119,7 +122,53 @@
       git pull origin ${BRANCH}
     fi
 
+    # fixing not-up-to-date master issues
+    git checkout master
+    git pull
+    git checkout some/branch
+    git merge master
+    git push -u origin some/branch
+
+    # merge branch with latest tag
+    git checkout my-branch
+    git merge $(git describe --tags $(git rev-list --tags --max-count=1))
     
+##### working with many users
+
+Config
+
+    # content of ~/.ssh/config
+    
+    Host fake-A
+      HostName git.company.com
+      User git
+      IdentityFile /home/someuser/.ssh/id_rsa.A
+      IdentitiesOnly yes
+    
+    Host fake-B
+      HostName git.company.com
+      User git
+      IdentityFile /home/someuser/.ssh/id_dsa.B
+      IdentitiesOnly yes
+
+Testing
+
+    ssh -vT git@fake-A
+
+Usage
+
+    git remote add alice git@fake-A:repo.git
+    git remote add bob git@fake-as-B:repo.git
+
+##### customizing git diff
+
+Use vimdiff as diff tool
+
+    git config --global diff.tool vimdiff
+    git config --global difftool.prompt false
+    git config --global alias.d difftool
+    git d someFile.with.changes.md
+
 ##### meaning of symobls ^ ~
     
 Both ~ and ^ on their own refer to the parent of the commit (~~ and ^^ both refer to the grandparent commit, etc.)

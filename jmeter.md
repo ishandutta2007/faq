@@ -61,6 +61,54 @@ Plugin related jars for jmeter-plugins.org:
 
     https://github.com/undera/jmeter-plugins/search?q=guava-19.0.0
 
+##### running
+
+Running gui
+
+    cd $(dirname $0)
+    myBase=$(pwd)
+    cd /opt/jmeter/apache-jmeter-5.4.1/bin
+    java \
+     -jar ApacheJMeter.jar \
+     -LDEBUG \
+     -j ${myBase}/log/jmeter.run.log \
+     -l ${myBase}/log/jmeter.jtl.log \
+     -JJMETER_LOG_BASE=${myBase}/log \
+     -t ${myBase}/test-data/perf-test.jmx \
+     1>${myBase}/log/jmeter.stdout.log \
+     2>${myBase}/log/jmeter.stderr.log
+
+Running cmd
+
+    cd $(dirname $0)
+    rm log/*.log
+    myBase=$(pwd)
+    cd /opt/jmeter/apache-jmeter-5.4.1/bin
+    java \
+     -jar ApacheJMeter.jar \
+     -JtestServer=127.0.0.1 \
+     -JtestPort=8080 \
+     -JtestProtocol=http \
+     -JtestThreads=4 \
+     -JtestDurationSec=120 \
+     -JtestRampupSec=3 \
+     -JtestDelaySec=0 \
+     -JtestTps=1 \
+     -LERROR \
+     -j ${myBase}/log/jmeter.run.log \
+     -l ${myBase}/log/jmeter.jtl.log \
+     -JJMETER_LOG_BASE=${myBase}/log \
+     -n -t ${myBase}/test-data/perf-test.jmx \
+     1>${myBase}/log/jmeter.stdout.log \
+     2>${myBase}/log/jmeter.stderr.log
+
+Running plugins from dedicated locations only
+
+    cd /opt/jmeter/apache-jmeter-5.4.1/bin
+    java -jar ApacheJMeter.jar "$@"
+     -t test.jmx \
+     -Jsearch_paths="$HOME/jmeter/plugins/custom-thread-groups/ext;$HOME/jmeter/plugins/jpgc-cmn/lib"
+
 ##### performance
 
 General rules
@@ -366,7 +414,7 @@ Logging details with JSR sampler (more details @ https://www.pushbeta.com/2019/1
 
 ##### reports
 
-Creating jmeter dashboard report
+Creating basic jmeter dashboard report
 
      ${JAVA_HOME}/bin/java \
       -jar "${JMETER_HOME}/bin/ApacheJMeter.jar" \
@@ -375,9 +423,86 @@ Creating jmeter dashboard report
       -j "${outputDir}/jmeter/`basename ${jmeterCsvResultLog}`.report.log" \
       -J jmeter.reportgenerator.temp_dir="${outputDir}/jmeter/"
 
+A script with some parameters
+
+    jmeterVer=5.4.1
+    jdkVer=1.8.0_291
+    jmeterDir=/opt/jmeter
+    jmeterLog="$(readlink -f $1)"
+    
+    echo "using jmeter [${jmeterVer}], jdk [${jdkVer}], log [${jmeterLog}]"
+    test -f /opt/jdk/jdk${jdkVer}/bin/java || { echo "File not found [${HOME}/opt/jdk/jdk${jdkVer}/bin/java]"; exit 1; }
+    test -f /opt/jmeter/apache-jmeter-${jmeterVer}/bin/ApacheJMeter.jar || { echo "File not found [${HOME}/opt/jmeter/apache-jmeter-${jmeterVer}/bin/ApacheJMeter.jar]"; exit 1; }
+    test -f $1 || { echo "JMeter csv log file not found [$1]"; exit 1; }
+    reportDir=/tmp/jmeter/test-reports/$(date +'%Y.%m.%d_%H.%M.%S')
+    mkdir -p ${reportDir}
+    
+    cd /opt/jmeter/apache-jmeter-${jmeterVer}/bin
+    /opt/jdk/jdk${jdkVer}/bin/java \
+     -jar ApacheJMeter.jar \
+     -g ${jmeterLog} \
+     -o ${reportDir}
+    
+    echo "report created in [${reportDir}]"
+
 Exmaple of usage for log with over 1 million lines
 
     java -Xms32g -Xmx32g -XX:NewRatio=1 -XX:-UseAdaptiveSizePolicy -server -jar ApacheJMeter.jar -g /tmp/jmeter.log.csv -o /tmp/report 
+
+##### jmeter setup script that can be used for docker
+
+Get jmeter and update jar from priv or public repo if needed
+
+    export JMETER_VERSION=5.4.1
+    export REPO_USER=myusername
+    export REPO_PASS=myuserpass
+    
+    #####################
+    # get distro
+
+    wget https://downloads.apache.org/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz
+    tar -zxf apache-jmeter-${JMETER_VERSION}.tgz
+    rm apache-jmeter-${JMETER_VERSION}.tgz
+    cd apache-jmeter-${JMETER_VERSION}
+    rm -rf docs extras LICENSE licenses NOTICE printable_docs README.md
+
+    #####################
+    # update libs
+
+    wget --user=${REPO_USER} --password=${REPO_PASS} https://repo.company.com/repo/maven/net/minidev/accessors-smart/2.4.7/accessors-smart-2.4.7.jar
+    rm lib/accessors-smart-1.2.jar
+    mv accessors-smart-2.4.7.jar lib/
+    
+    wget --user=${REPO_USER} --password=${REPO_PASS} https://repo.company.com/repo/maven/org/ow2/asm/asm/9.1/asm-9.1.jar
+    rm lib/asm-9.0.jar
+    mv asm-9.1.jar lib/
+    
+    wget --user=${REPO_USER} --password=${REPO_PASS} https://repo.company.com/repo/maven/net/minidev/json-smart/2.4.7/json-smart-2.4.7.jar
+    rm lib/json-smart-2.3.jar
+    mv json-smart-2.4.7.jar lib/
+    
+    #wget https://search.maven.org/remotecontent?filepath=com/thoughtworks/xstream/xstream/1.4.17/xstream-1.4.17.jar
+    #wget https://repo1.maven.org/maven2/com/thoughtworks/xstream/xstream/1.4.17/xstream-1.4.17.jar
+    wget --user=${REPO_USER} --password=${REPO_PASS} https://repo.company.com/repo/maven/com/thoughtworks/xstream/xstream/1.4.17/xstream-1.4.17.jar
+    rm lib/xstream-1.4.15.jar
+    mv xstream-1.4.17.jar lib/
+    
+    wget https://code.jquery.com/jquery-3.6.0.min.js
+    mv jquery-3.6.0.min.js bin/report-template/sbadmin2-1.0.7/bower_components/jquery/dist/jquery.min.js
+    wget https://code.jquery.com/jquery-3.6.0.js
+    mv jquery-3.6.0.js bin/report-template/sbadmin2-1.0.7/bower_components/jquery/dist/jquery.js
+    
+    #####################
+    # set up required plugins
+
+    wget https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.6/jmeter-plugins-manager-1.6.jar
+    mv jmeter-plugins-manager-1.6.jar lib/ext/
+    wget https://repo1.maven.org/maven2/kg/apc/cmdrunner/2.2/cmdrunner-2.2.jar
+    mv cmdrunner-2.2.jar lib/
+    
+    java -cp lib/ext/jmeter-plugins-manager-1.6.jar org.jmeterplugins.repository.PluginManagerCMDInstaller
+    
+    bin/PluginsManagerCMD.sh install bzm-random-csv,jpgc-functions,kafkameter,ssh-sampler
 
 ##### utilities
 

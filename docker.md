@@ -9,13 +9,18 @@
     sudo systemctl status docker
     sudo systemctl enable docker
         
-##### install on WSL1 and win10
+##### install Docker Desktop on WSL1 and win10
 
 Install Hyper-v
 
 Only when Hyper-v installed, install Docker Desktop for windows
 
 Update docker desktop settings (only 'Expose daemon on tcp://localhost:2375 without TLS' should be checked')
+
+Check from windows CMD
+
+    docker --version
+    docker help
 
 Setup docker on Ubuntu on WSL1 as described in https://docs.docker.com/engine/install/ubuntu/
     
@@ -103,8 +108,22 @@ Delete image
 
     docker rmi python-test:2021.01
 
+
+Backup container
+
+    # docker save will produce a tarball, but with all parent layers, and all tags + versions.
+    # docker export does also produce a tarball, but without any layer/history.
+    docker commit −p 2c4b116fa352 python-test
+    docker save python-test | gzip > /tmp/python-test.latest.tar.gz
+    #docker save −o /tmp/python-test.latest.tar python-test
+    docker export python-test > /tmp/python-test.latest.tar.gz
+    docker export --output="/tmp/python-test.latest.tar.gz" python-test
+
 Import image
 
+    docker import /tmp/python-test.latest.tar.gz
+    cat /tmp/python-test.latest.tar.gz | docker import - python-test:latest
+    #docker load -i /tmp/python-test.latest.tar
     docker load < /tmp/python-test.latest.tar.gz
 
 Verify again
@@ -113,9 +132,14 @@ Verify again
 
 Exmamine docker image content 
 
-    docker run -it python-test sh
+    docker run --rm -it python-test /bin/sh
 
-Exmamine docker image history 
+Commit your changes made on docker container
+
+    dockerId=$(docker ps --format "{{.ID}}")
+    docker commit -m "changes made" ${dockerId} python-test:2021.01
+
+Examine docker image history 
 
     docker image history --no-trunc python-test > image_history.txt
 
@@ -126,6 +150,16 @@ Create dockerfile from image with following script:
      sed 's,^\(|3.*\)\?/bin/\(ba\)\?sh -c,RUN,'             | # change /bin/(ba)?sh calls to RUN
      sed 's,^RUN #(nop) *,,'                                | # remove RUN #(nop) calls for ENV,LABEL...
      sed 's,  *&&  *, \\\n \&\& ,g'                           # pretty print multi command lines following Docker best practices
+
+Get data from docker volume
+
+    docker volume ls | grep jmeter-prj-cANhHSOlCgBH
+    docker volume inspect jmeter-prj-cANhHSOlCgBH-0
+    ls /var/lib/docker/volumes/jmeter-prj-cANhHSOlCgBH-0/_data
+    sudo ls /var/lib/docker/volumes/jmeter-prj-cANhHSOlCgBH-0/_data
+    sudo ls -al /var/lib/docker/volumes/jmeter-prj-cANhHSOlCgBH-0/_data
+    sudo cp -a /var/lib/docker/volumes/jmeter-prj-cANhHSOlCgBH-0/_data /tmp/report
+
 
 ##### moving image from local to remote repo
 
