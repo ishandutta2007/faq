@@ -2,25 +2,70 @@
 
 ##### Create new project
 
-Create from command line
+Create from script
 
-    $ mkdir gitlab-project
-    $ cd gitlab-project
-    $ git init
-    $ touch .gitignore README.md
-    $ git add -A
-    $ git commit -m 'Initial commit'
+    myPrj='X'
+    myRepo='Y'
     
-    # for Git over HTTPS
-    $ git push --set-upstream https://gitlab.com/project/repo.git
-
-    # update  .git/config for ssh access
-    [remote "origin"]
-            url = git@gitlab.com:project/repo.git
-            fetch = +refs/heads/*:refs/remotes/origin/*
+    # create dir
+    mkdir ${myRepo}
+    cd ${myRepo}
+    git init
+    
+    # update config
+    cat <<EOF>./.git/config
+    [core]
+       repositoryformatversion = 0
+       filemode = false
+       bare = false
+       logallrefupdates = true
+       ignorecase = true
+    [branch "main"]
+       remote = origin
+       merge = refs/heads/main
+    [user]
+       name = ${myRepo}
+       email = ${myRepo}@deepinspace.com
     [branch "master"]
-            remote = git@gitlab.com:project/repo.git
-            merge = refs/heads/master
+       remote = origin
+       merge = refs/heads/master
+    EOF
+    
+    touch .gitignore
+    git add -A
+    git commit -m 'Initial commit'
+    
+    # push
+    git push --set-upstream https://gitlab.com/${myPrj}/${myRepo}.git
+    # remote:
+    # remote:
+    # remote: The private project go-for/mountebank was successfully created.
+    # remote:
+    # remote: To configure the remote, run:
+    # remote:   git remote add origin https://gitlab.com/X/Y.git
+    # remote:
+    # remote: To view the project, visit:
+    # remote:   https://gitlab.com/X/Y
+    # remote:
+    # remote:
+    # remote:
+    # To https://gitlab.com/X/Y.git
+    #  * [new branch]      master -> master
+    # Branch 'master' set up to track remote branch 'master' from 'https://gitlab.com/X/Y.git'.
+    
+    # change to ssh
+    cat <<EOF>>./.git/config
+    [remote "origin"]
+       url = git@gitlab.com:${myPrj}/${myRepo}.git
+       fetch = +refs/heads/*:refs/remotes/origin/*
+    EOF
+    sed -i 's/remote =.*/remote = origin/' ./.git/config
+    
+    touch README.md
+    git add README.md
+    git commit -m 'added README.md' README.md
+    git push
+
 
 NOTE: in case you ses smth like: 
 
