@@ -13,6 +13,14 @@ Checking system limits for application user
 
     ssh user@box "echo \$USER; ulimit -a"
          
+Creating passwords for shawdow
+
+    # md5
+    echo 'myPassword' | openssl passwd -1 -stdin
+    # msha256
+    python -c "import crypt; print (crypt.crypt('myPassword'))"
+
+
 List all cron jobs from the box
 
     sudo less /etc/cron.*/*

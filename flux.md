@@ -10,6 +10,97 @@ Utility script to run flux queries
      -H 'content-type:application/vnd.flux' \
      -d "${query}"
 
+Example queries
+
+    #range='start: -24h'
+    #range='start: 2021-04-09T06:00:00Z, stop: 2021-04-09T07:00:00Z'
+
+    allMeasurementData='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> filter(fn: (r) => r._measurement == "'"${measurement}"'")
+      |> yield()
+    '
+
+    countData='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> filter(fn: (r) => r._measurement == "'"${measurement}"'")
+      |> count()
+      |> yield()
+    '
+
+    countData='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> keep(columns: ["_measurement"])
+      |> map(fn: (r) => ({_value: r._measurement}))
+      |> count()
+      |> yield()
+    '
+
+    listMeasurements='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> keep(columns: ["_measurement"])
+      |> map(fn: (r) => ({_value: r._measurement}))
+      |> unique()
+      |> yield()
+    '
+
+    countMeasurementData='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> filter(fn: (r) => r._measurement == "'"${measurement}"'")
+      |> keep(columns: ["_measurement"])
+      |> map(fn: (r) => ({_value: r._measurement}))
+      |> count()
+      |> yield()
+    '
+    
+    probeMeasurementData='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> filter(fn: (r) => r._measurement == "'"${measurement}"'")
+      |> limit(n:10,offset: 0)
+      |> yield()
+    '
+
+    listFields='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> filter(fn: (r) => r._measurement == "'"${measurement}"'")
+      |> keep(columns: ["_field"])
+      |> map(fn: (r) => ({_value: r._field}))
+      |> unique()
+      |> yield()
+    '
+
+    probeMeasurementFieldData='
+     from(bucket: "myBucket")
+      |> range('"${range}"')
+      |> filter(fn: (r) => r._measurement == "'"${measurement}"'" and r._field == "'"${field}"'")
+      |> limit(n:10,offset: 0)
+      |> yield()
+    '
+    
+    listTags='
+     import "influxdata/influxdb/v1"
+     v1.tagKeys(bucket: "myBucket")
+    '
+    
+    listTags='
+     import "influxdata/influxdb/v1"
+     v1.measurementTagKeys(bucket: "myBucket", measurement: "${measurement}")
+    '
+    
+    
+    listTagsNew='
+     import "influxdata/influxdb/schema"
+     schema.tagKeys(bucket: "myBucket")
+    '
+
+
 Get TPS for jmeter backend listener
 
     selectedData = from(bucket:"myBucket")
@@ -76,6 +167,36 @@ Get unique list of column values
      |> keep(columns: ["Service"])
      |> unique(column: "Service")
      |> map(fn: (r) => ({_value: r.Service}))
+
+Calculate coefficient of variation
+
+    tps=from(bucket: "myBucket")
+     |> range(start: 2022-04-22T14:12:45Z, stop: 2022-04-22T18:45:20Z)
+     |> filter(fn: (r) => r._measurement == "logging.googleapis.com/user/ssg"
+         and r.FromEndPoint == "pointStart"
+         and r.ToEndPoint == "pointStop"
+         and r.Status == "SUCCESS"
+         and r._field == "status_count"
+         and r._value !=0
+         and r.test_id == "ZX9938277" )
+     |> keep(columns: ["_time","_value"])
+     |> map(fn: (r) => ({ time: r.time, _value: float(v: r._value) / 60.0}))
+    
+    tps_stddev = tps
+     |> stddev()
+     |> set(key:"_field", value:"stddev")
+     |> set(key:"_measurement", value:"tps")
+    
+    tps_mean = tps
+     |> mean()
+     |> set(key:"_field", value:"mean")
+     |> set(key:"_measurement", value:"tps")
+    
+    union(tables: [tps_stddev,tps_mean])
+     |> pivot(rowKey:["_measurement"], columnKey: ["_field"], valueColumn: "_value")
+     |> map(fn: (r) => ({ r with cov: r.stddev/r.mean}))
+     |> yield()
+
 
 Using wget intead of curl
 
