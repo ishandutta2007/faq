@@ -15,3 +15,9 @@ Legacy boot
 
  * enable legacy boot
  * disable secure booting
+
+##### References
+
+CPU
+
+ * https://www.golinuxcloud.com/processors-cpu-core-threads-explained

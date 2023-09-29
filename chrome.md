@@ -38,6 +38,8 @@ Enhanced browsing
  * InVID WeVerify extension
    [Fake news debunker by InVID & WeVerify](https://chrome.google.com/webstore/detail/fake-news-debunker-by-inv/mhccpoafgdgbhnjfhkcmgknndkeenfhe)
 
+ * Blocks all images and visual contents on desired websites
+   [Fast Image Blocker](https://chrome.google.com/webstore/detail/fast-image-blocker/khgnndhdnkpmlflndgobodbhgheaegon)
  
 Security
 
@@ -64,9 +66,6 @@ Working with files
 
  * View markdown file in Chrome.
    [MarkView](https://chrome.google.com/webstore/detail/markview/iaddkimmopgchbbnmfmdcophmlnghkim)
-
- * Allows viewing csv files (.csv) directly inside Chrome.
-   [Recline CSV Viewer]()
 
  * Allows viewing csv files (.csv) directly inside Chrome.
    [Recline CSV Viewer](https://chrome.google.com/webstore/detail/recline-csv-viewer/ibfcfelnbfhlbpelldnngdcklnndhael)
@@ -101,7 +100,7 @@ Utils
    [The RSS Aggregator](https://chrome.google.com/webstore/detail/the-rss-aggregator/ffhafkagcdhnhamiaecajogjcfgienom)
   
  * Take FULL webpage screenshots. Capture, edit and save them to PDF/JPEG/GIF/PNG, upload, print, send to OneNote, clipboard or email.
-   [Take Webpage Screenshots Entirely - FireShot]()
+   [Take Webpage Screenshots Entirely - FireShot](https://chrome.google.com/webstore/detail/take-webpage-screenshots/mcbpblocgmgfnpjjppndjkmgjaogfceg)
 
  * Night Shift automatically shifts the colors of your browser content to warmer end of the color spectrum after dark
    [Night Shift](https://chrome.google.com/webstore/detail/night-shift/fpnlpehjhijpamloppfjljenemeokfio)

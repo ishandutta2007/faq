@@ -12,6 +12,7 @@ Edit _vimrc accordingly
       set encoding=utf-8
       setglobal fileencoding=utf-8 bomb
       set fileencodings=ucs-bom,utf-8,latin1
+      set spell spelllang=pl
     endif
      
     "some MS WIN enhancements
@@ -24,13 +25,16 @@ Edit _vimrc accordingly
     set nowritebackup
     set paste
     set gfn=Consolas:h10:cANSI:qDRAFT
+    set backspace=indent,eol,start
+    source $VIMRUNTIME/mswin.vim
+    behave mswin
     endif
 
 This should make possible to use pl keyboard with nice fonts and give the access to PowerShell directly from VIM.
 
-For getting spell check use command ‘:setlocal spell splelllang=pl’, vim try to download whatever is needed
+For getting spell check use command `:setlocal spell spelllang=pl` or set it in vimrc file as in example above, vim try to download whatever is needed 
 If there is problem, you can download dictionaries for spell check manually from e.g. ftp://ftp.vim.org/pub/vim/runtime/spell/.
-Then add these dictionaries (.spl files) to spell directory in your vim.
+Then add these dictionaries (.spl files) to spell directory in your vim (e.g. vim81/spell).
 For Polish you can download pl.cp1250.spl, pl.utf-8.spl and pl.iso-8859-2.spl
 
 Working with spelling

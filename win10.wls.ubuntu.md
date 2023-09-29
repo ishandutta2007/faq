@@ -70,6 +70,21 @@ Install java
  * set `DefaultUid` to previous value (usually 3e8 HEX)
  * open linux wsl and `su -` to verify the change
 
+##### Users
+
+Setting valid user instead of root for WSL2
+
+Script
+
+    Get-ItemProperty Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss\*\ DistributionName | Where-Object -Property DistributionName -eq <UbuntuCustom> | Set-ItemProperty -Name DefaultUid -Value 1000
+
+Manually
+
+ * find your UID for your username in your Linux distro typing
+   in the `command id -u <yourUserName>` , remember this value.
+ * open registry edit and navigate to `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss\{MY-UUID}`
+ * replace the `DefaultUid` value with the UID value of the user in your distro.
+
 ##### Accessing linux desktop from win10
 
 On WSL side:
@@ -102,4 +117,4 @@ Create valid /etc/resolv.conf with content like
 
 Restart WLS
 
-   Get-Service LxssManager | Restart-Service
+    Get-Service LxssManager | Restart-Service

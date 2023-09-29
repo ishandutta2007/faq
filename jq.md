@@ -23,6 +23,16 @@ Changing json content
       }
     }
 
+Delting from .json for easy import
+
+    cat grafana_export.json | jq 'del(.meta)|del(.dashboard |.__requires,.id,.iteration)' > import.json
+
+    curl --user admin:admin \
+     "${grafanaHost}/api/dashboards/db" \
+     -X POST \
+     -H "Content-Type:application/json;charset=UTF-8" \
+     --data-binary @import.json
+
 Moving csv into json with jq
 
     # content of file.csv
