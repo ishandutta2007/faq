@@ -30,15 +30,21 @@
     # note you can also copy data from cdrom and mount it like
     # mount d ~/games/cdcontent -t cdrom
 
+##### running a game from script
+
+    > dosbox \
+    -c 'mount c ~/dos' \
+    -c 'mount d ~/games/cdcontent/mygame -t cdrom' \
+    -c 'c:' \
+    -c 'cd mygame' \
+    -c 'MYGAME.exe'
+
+
 ##### using autoexec
 
     cd ~/.dosbox
     vi dosbox-*.conf
     # edit [autoexec] section, example below
     mount C ~/dos
-    mount D ~/games/mygame -t cdrom
-    #mount -u D:
     C:
-    cd installedGame
-    RUN.exe
 
